@@ -21,6 +21,15 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserDetail, setShowUserDetail] = useState(false);
+  const [showSellerDetail, setShowSellerDetail] = useState(false);
+  const [showOrderDetail, setShowOrderDetail] = useState(false);
+  const [showEditSchool, setShowEditSchool] = useState(false);
+  const [showDeleteSchoolConfirm, setShowDeleteSchoolConfirm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedSeller, setSelectedSeller] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedSchool, setSelectedSchool] = useState(null);
   const [newSchool, setNewSchool] = useState({
     name: '',
     address: '',
@@ -32,29 +41,29 @@ const AdminDashboard = () => {
     { id: 3, title: 'User Baru', message: '5 siswa baru bergabung hari ini', time: '4 jam lalu', read: true }
   ]);
 
-  const users = [
-    { id: 1, name: 'Ahmad Siswa', email: 'ahmad@smk13.edu', role: 'Siswa', school: 'SMK 13 BANDUNG' },
-    { id: 2, name: 'Bu Sari', email: 'sari@kantin.smk13.edu', role: 'Penjual', school: 'SMK 13 BANDUNG' },
-    { id: 3, name: 'Siti Murid', email: 'siti@sma5.edu', role: 'Siswa', school: 'SMA 5 Jakarta' }
-  ];
+  const [users] = useState([
+    { id: 1, name: 'Ahmad Siswa', email: 'ahmad@smk13.edu', role: 'Siswa', school: 'SMK 13 BANDUNG', class: 'XII RPL 1', phone: '081234567890' },
+    { id: 2, name: 'Bu Sari', email: 'sari@kantin.smk13.edu', role: 'Penjual', school: 'SMK 13 BANDUNG', phone: '082345678901' },
+    { id: 3, name: 'Siti Murid', email: 'siti@sma5.edu', role: 'Siswa', school: 'SMA 5 Jakarta', class: 'XI IPA 2', phone: '083456789012' }
+  ]);
 
-  const schools = [
-    { id: 1, name: 'SMK 13 BANDUNG', address: 'Jl. Raya Bandung No. 123', students: 1250, canteens: 5 },
-    { id: 2, name: 'SMA 5 Jakarta', address: 'Jl. Sudirman No. 45', students: 980, canteens: 3 },
-    { id: 3, name: 'SMP 2 Bandung', address: 'Jl. Asia Afrika No. 67', students: 750, canteens: 4 }
-  ];
+  const [schools, setSchools] = useState([
+    { id: 1, name: 'SMK 13 BANDUNG', address: 'Jl. Raya Bandung No. 123', students: 1250, canteens: 5, contact: '022-1234567' },
+    { id: 2, name: 'SMA 5 Jakarta', address: 'Jl. Sudirman No. 45', students: 980, canteens: 3, contact: '021-2345678' },
+    { id: 3, name: 'SMP 2 Bandung', address: 'Jl. Asia Afrika No. 67', students: 750, canteens: 4, contact: '022-3456789' }
+  ]);
 
-  const sellers = [
-    { id: 1, name: 'Bu Sari', canteen: 'Kantin Bu Sari', school: 'SMK 13 BANDUNG', status: 'Aktif' },
-    { id: 2, name: 'Pak Budi', canteen: 'Kantin Pak Budi', school: 'SMK 13 BANDUNG', status: 'Aktif' },
-    { id: 3, name: 'Bu Rita', canteen: 'Kantin Bu Rita', school: 'SMA 5 Jakarta', status: 'Nonaktif' }
-  ];
+  const [sellers] = useState([
+    { id: 1, name: 'Bu Sari', canteen: 'Kantin Bu Sari', school: 'SMK 13 BANDUNG', status: 'Aktif', phone: '082345678901', totalSales: 450000 },
+    { id: 2, name: 'Pak Budi', canteen: 'Kantin Pak Budi', school: 'SMK 13 BANDUNG', status: 'Aktif', phone: '084567890123', totalSales: 320000 },
+    { id: 3, name: 'Bu Rita', canteen: 'Kantin Bu Rita', school: 'SMA 5 Jakarta', status: 'Nonaktif', phone: '085678901234', totalSales: 150000 }
+  ]);
 
-  const orders = [
-    { id: 'ORD001', customer: 'Ahmad Siswa', seller: 'Bu Sari', total: 33000, status: 'Selesai', date: '15/01/2024' },
-    { id: 'ORD002', customer: 'Siti Murid', seller: 'Pak Budi', total: 12000, status: 'Diproses', date: '15/01/2024' },
-    { id: 'ORD003', customer: 'Budi Pelajar', seller: 'Bu Rita', total: 15000, status: 'Dibatalkan', date: '14/01/2024' }
-  ];
+  const [orders] = useState([
+    { id: 'ORD001', customer: 'Ahmad Siswa', seller: 'Bu Sari', total: 33000, status: 'Selesai', date: '15/01/2024', items: '2x Nasi Gudeg, 1x Es Teh' },
+    { id: 'ORD002', customer: 'Siti Murid', seller: 'Pak Budi', total: 12000, status: 'Diproses', date: '15/01/2024', items: '1x Ayam Geprek' },
+    { id: 'ORD003', customer: 'Budi Pelajar', seller: 'Bu Rita', total: 15000, status: 'Dibatalkan', date: '14/01/2024', items: '3x Keripik Singkong' }
+  ]);
 
   const handleAddSchool = () => {
     if (!newSchool.name || !newSchool.address) {
@@ -73,6 +82,76 @@ const AdminDashboard = () => {
     });
     
     setShowAddSchoolModal(false);
+    setNewSchool({ name: '', address: '', contact: '' });
+  };
+
+  const handleViewUser = (user: any) => {
+    setSelectedUser(user);
+    setShowUserDetail(true);
+  };
+
+  const handleViewSeller = (seller: any) => {
+    setSelectedSeller(seller);
+    setShowSellerDetail(true);
+  };
+
+  const handleViewOrder = (order: any) => {
+    setSelectedOrder(order);
+    setShowOrderDetail(true);
+  };
+
+  const handleEditSchool = (school: any) => {
+    setSelectedSchool(school);
+    setNewSchool({
+      name: school.name,
+      address: school.address,
+      contact: school.contact || ''
+    });
+    setShowEditSchool(true);
+  };
+
+  const handleDeleteSchool = (school: any) => {
+    setSelectedSchool(school);
+    setShowDeleteSchoolConfirm(true);
+  };
+
+  const confirmDeleteSchool = () => {
+    if (selectedSchool) {
+      setSchools(schools.filter(s => s.id !== selectedSchool.id));
+      showToast({
+        type: 'success',
+        title: 'Sekolah Dihapus',
+        description: `${selectedSchool.name} berhasil dihapus`
+      });
+    }
+    setShowDeleteSchoolConfirm(false);
+    setSelectedSchool(null);
+  };
+
+  const handleUpdateSchool = () => {
+    if (!newSchool.name || !newSchool.address) {
+      showToast({
+        type: 'error',
+        title: 'Error',
+        description: 'Harap isi nama dan alamat sekolah'
+      });
+      return;
+    }
+
+    setSchools(schools.map(s => 
+      s.id === selectedSchool.id 
+        ? {...s, name: newSchool.name, address: newSchool.address, contact: newSchool.contact}
+        : s
+    ));
+    
+    showToast({
+      type: 'success',
+      title: 'Sekolah Diperbarui',
+      description: `${newSchool.name} berhasil diperbarui`
+    });
+    
+    setShowEditSchool(false);
+    setSelectedSchool(null);
     setNewSchool({ name: '', address: '', contact: '' });
   };
 
@@ -148,14 +227,9 @@ const AdminDashboard = () => {
                     {getRoleBadge(user.role)}
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
+                <Button variant="outline" size="icon" onClick={() => handleViewUser(user)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
               </div>
             </Card>
           ))}
@@ -225,10 +299,10 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" onClick={() => handleEditSchool(school)}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" onClick={() => handleDeleteSchool(school)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -339,14 +413,9 @@ const AdminDashboard = () => {
                     {getStatusBadge(seller.status)}
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="icon">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                </div>
+                <Button variant="outline" size="icon" onClick={() => handleViewSeller(seller)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
               </div>
             </Card>
           ))}
@@ -408,7 +477,7 @@ const AdminDashboard = () => {
                     {getStatusBadge(order.status)}
                   </div>
                 </div>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" onClick={() => handleViewOrder(order)}>
                   <Eye className="w-4 h-4" />
                 </Button>
               </div>

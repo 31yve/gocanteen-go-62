@@ -78,6 +78,17 @@ const SellerDashboard = () => {
     canteen: 'Kantin Bu Sari',
     address: 'SMK 13 Bandung'
   });
+  const [showEditOperationalHours, setShowEditOperationalHours] = useState(false);
+  const [showEditCanteenData, setShowEditCanteenData] = useState(false);
+  const [operationalHours, setOperationalHours] = useState({
+    weekdays: '07:00 - 14:00',
+    saturday: '07:00 - 12:00'
+  });
+  const [canteenData, setCanteenData] = useState({
+    name: 'Kantin Bu Sari',
+    location: 'Gedung A, Lantai 1',
+    phone: '0812-3456-7890'
+  });
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -936,14 +947,14 @@ const SellerDashboard = () => {
                 <Clock className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Senin - Jumat: 07:00 - 14:00</span>
               </div>
-              <Button variant="outline" size="sm">Edit</Button>
+              <Button variant="outline" size="sm" onClick={() => setShowEditOperationalHours(true)}>Edit</Button>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Sabtu: 07:00 - 12:00</span>
               </div>
-              <Button variant="outline" size="sm">Edit</Button>
+              <Button variant="outline" size="sm" onClick={() => setShowEditOperationalHours(true)}>Edit</Button>
             </div>
           </div>
         </Card>
@@ -972,7 +983,7 @@ const SellerDashboard = () => {
               </div>
               <span className="text-sm font-medium">0812-3456-7890</span>
             </div>
-            <Button variant="outline" className="w-full mt-2">
+            <Button variant="outline" className="w-full mt-2" onClick={() => setShowEditCanteenData(true)}>
               Edit Data Kantin
             </Button>
           </div>
@@ -1259,6 +1270,92 @@ const SellerDashboard = () => {
               Batal
             </Button>
             <Button className="flex-1" onClick={() => handleEditProfile(profile)}>
+              Simpan
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Operational Hours Modal */}
+      <Modal isOpen={showEditOperationalHours} onClose={() => setShowEditOperationalHours(false)} title="Edit Jam Operasional">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="weekdaysHours">Senin - Jumat</Label>
+            <Input
+              id="weekdaysHours"
+              placeholder="Contoh: 07:00 - 14:00"
+              value={operationalHours.weekdays}
+              onChange={(e) => setOperationalHours({...operationalHours, weekdays: e.target.value})}
+            />
+          </div>
+          <div>
+            <Label htmlFor="saturdayHours">Sabtu</Label>
+            <Input
+              id="saturdayHours"
+              placeholder="Contoh: 07:00 - 12:00"
+              value={operationalHours.saturday}
+              onChange={(e) => setOperationalHours({...operationalHours, saturday: e.target.value})}
+            />
+          </div>
+          <div className="flex space-x-3">
+            <Button variant="outline" className="flex-1" onClick={() => setShowEditOperationalHours(false)}>
+              Batal
+            </Button>
+            <Button className="flex-1" onClick={() => {
+              showToast({
+                type: 'success',
+                title: 'Jam Operasional Diperbarui',
+                description: 'Jam operasional berhasil diperbarui'
+              });
+              setShowEditOperationalHours(false);
+            }}>
+              Simpan
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit Canteen Data Modal */}
+      <Modal isOpen={showEditCanteenData} onClose={() => setShowEditCanteenData(false)} title="Edit Data Kantin">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="canteenName">Nama Kantin</Label>
+            <Input
+              id="canteenName"
+              value={canteenData.name}
+              onChange={(e) => setCanteenData({...canteenData, name: e.target.value})}
+            />
+          </div>
+          <div>
+            <Label htmlFor="canteenLocation">Lokasi</Label>
+            <Input
+              id="canteenLocation"
+              placeholder="Contoh: Gedung A, Lantai 1"
+              value={canteenData.location}
+              onChange={(e) => setCanteenData({...canteenData, location: e.target.value})}
+            />
+          </div>
+          <div>
+            <Label htmlFor="canteenPhone">Telepon</Label>
+            <Input
+              id="canteenPhone"
+              placeholder="Contoh: 0812-3456-7890"
+              value={canteenData.phone}
+              onChange={(e) => setCanteenData({...canteenData, phone: e.target.value})}
+            />
+          </div>
+          <div className="flex space-x-3">
+            <Button variant="outline" className="flex-1" onClick={() => setShowEditCanteenData(false)}>
+              Batal
+            </Button>
+            <Button className="flex-1" onClick={() => {
+              showToast({
+                type: 'success',
+                title: 'Data Kantin Diperbarui',
+                description: 'Data kantin berhasil diperbarui'
+              });
+              setShowEditCanteenData(false);
+            }}>
               Simpan
             </Button>
           </div>
