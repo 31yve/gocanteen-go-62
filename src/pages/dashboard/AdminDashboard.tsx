@@ -260,6 +260,86 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* User Detail Modal */}
+        <Modal isOpen={showUserDetail} onClose={() => setShowUserDetail(false)} title="Detail User">
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-8 h-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{selectedUser.name}</h3>
+                  {getRoleBadge(selectedUser.role)}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{selectedUser.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sekolah</p>
+                  <p className="font-medium">{selectedUser.school}</p>
+                </div>
+                {selectedUser.class && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Kelas</p>
+                    <p className="font-medium">{selectedUser.class}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm text-muted-foreground">No. Telepon</p>
+                  <p className="font-medium">{selectedUser.phone}</p>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowUserDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+
+        {/* Notifications Modal */}
+        <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Notifikasi Admin">
+          <div className="space-y-4">
+            {notifications.map((notif) => (
+              <div key={notif.id} className={`p-3 rounded-lg border ${!notif.read ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'}`}>
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-medium text-sm">{notif.title}</h4>
+                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">{notif.message}</p>
+                {!notif.read && (
+                  <div className="flex justify-end mt-2">
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => {
+                        setNotifications(notifications.map(n => 
+                          n.id === notif.id ? {...n, read: true} : n
+                        ));
+                      }}
+                    >
+                      Tandai Dibaca
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                setNotifications(notifications.map(n => ({...n, read: true})));
+                showToast({ type: 'success', title: 'Semua notifikasi ditandai sebagai dibaca', description: '' });
+              }}
+            >
+              Tandai Semua Dibaca
+            </Button>
+          </div>
+        </Modal>
       </div>
     );
   }
@@ -385,285 +465,6 @@ const AdminDashboard = () => {
             ))}
           </div>
         </div>
-      </div>
-    );
-  }
-
-  // Sellers Tab
-  if (activeTab === 'sellers') {
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="bg-card border-b">
-          <div className="px-4 py-4">
-            <h1 className="text-xl font-bold">Data Penjual</h1>
-          </div>
-        </header>
-
-        {/* Sellers List */}
-        <div className="p-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {sellers.map((seller) => (
-            <Card key={seller.id} className="p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="font-semibold">{seller.name}</h3>
-                  <p className="text-sm text-muted-foreground">{seller.canteen}</p>
-                  <p className="text-sm text-muted-foreground">{seller.school}</p>
-                  <div className="mt-2">
-                    {getStatusBadge(seller.status)}
-                  </div>
-                </div>
-                <Button variant="outline" size="icon" onClick={() => handleViewSeller(seller)}>
-                  <Eye className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t">
-          <div className="flex items-center justify-around py-2 text-xs">
-            {[
-              { id: 'users', icon: Users, label: 'User' },
-              { id: 'schools', icon: School, label: 'Sekolah' },
-              { id: 'sellers', icon: Store, label: 'Penjual' },
-              { id: 'orders', icon: Package, label: 'Pesanan' },
-              { id: 'settings', icon: Settings, label: 'Setting' }
-            ].map(tab => (
-              <Button
-                key={tab.id}
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center space-y-1 ${
-                  activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'
-                }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span className="text-xs">{tab.label}</span>
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Orders Tab
-  if (activeTab === 'orders') {
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="bg-card border-b">
-          <div className="px-4 py-4">
-            <h1 className="text-xl font-bold">Data Pesanan</h1>
-          </div>
-        </header>
-
-        {/* Orders List */}
-        <div className="p-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {orders.map((order) => (
-            <Card key={order.id} className="p-4">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="font-semibold">{order.id}</h3>
-                  <p className="text-sm text-muted-foreground">{order.customer} → {order.seller}</p>
-                  <p className="text-sm text-muted-foreground">{order.date}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="font-semibold text-primary">
-                      Rp {order.total.toLocaleString('id-ID')}
-                    </span>
-                    {getStatusBadge(order.status)}
-                  </div>
-                </div>
-                <Button variant="outline" size="icon" onClick={() => handleViewOrder(order)}>
-                  <Eye className="w-4 h-4" />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        {/* Bottom Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t">
-          <div className="flex items-center justify-around py-2 text-xs">
-            {[
-              { id: 'users', icon: Users, label: 'User' },
-              { id: 'schools', icon: School, label: 'Sekolah' },
-              { id: 'sellers', icon: Store, label: 'Penjual' },
-              { id: 'orders', icon: Package, label: 'Pesanan' },
-              { id: 'settings', icon: Settings, label: 'Setting' }
-            ].map(tab => (
-              <Button
-                key={tab.id}
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center space-y-1 ${
-                  activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'
-                }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span className="text-xs">{tab.label}</span>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Notifications Modal */}
-        <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Notifikasi Admin">
-          <div className="space-y-4">
-            {notifications.map((notif) => (
-              <div key={notif.id} className={`p-3 rounded-lg border ${!notif.read ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'}`}>
-                <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-medium text-sm">{notif.title}</h4>
-                  <span className="text-xs text-muted-foreground">{notif.time}</span>
-                </div>
-                <p className="text-sm text-muted-foreground">{notif.message}</p>
-                {!notif.read && (
-                  <div className="flex justify-end mt-2">
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => {
-                        setNotifications(notifications.map(n => 
-                          n.id === notif.id ? {...n, read: true} : n
-                        ));
-                      }}
-                    >
-                      Tandai Dibaca
-                    </Button>
-                  </div>
-                )}
-              </div>
-            ))}
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => {
-                setNotifications(notifications.map(n => ({...n, read: true})));
-                showToast({ type: 'success', title: 'Semua notifikasi ditandai sebagai dibaca', description: '' });
-              }}
-            >
-              Tandai Semua Dibaca
-            </Button>
-          </div>
-        </Modal>
-
-        {/* User Detail Modal */}
-        <Modal isOpen={showUserDetail} onClose={() => setShowUserDetail(false)} title="Detail User">
-          {selectedUser && (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User className="w-8 h-8 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{selectedUser.name}</h3>
-                  {getRoleBadge(selectedUser.role)}
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Email</p>
-                  <p className="font-medium">{selectedUser.email}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Sekolah</p>
-                  <p className="font-medium">{selectedUser.school}</p>
-                </div>
-                {selectedUser.class && (
-                  <div>
-                    <p className="text-sm text-muted-foreground">Kelas</p>
-                    <p className="font-medium">{selectedUser.class}</p>
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm text-muted-foreground">No. Telepon</p>
-                  <p className="font-medium">{selectedUser.phone}</p>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full" onClick={() => setShowUserDetail(false)}>
-                Tutup
-              </Button>
-            </div>
-          )}
-        </Modal>
-
-        {/* Seller Detail Modal */}
-        <Modal isOpen={showSellerDetail} onClose={() => setShowSellerDetail(false)} title="Detail Penjual">
-          {selectedSeller && (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Store className="w-8 h-8 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{selectedSeller.name}</h3>
-                  {getStatusBadge(selectedSeller.status)}
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Nama Kantin</p>
-                  <p className="font-medium">{selectedSeller.canteen}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Sekolah</p>
-                  <p className="font-medium">{selectedSeller.school}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">No. Telepon</p>
-                  <p className="font-medium">{selectedSeller.phone}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Penjualan</p>
-                  <p className="font-medium text-primary">Rp {selectedSeller.totalSales?.toLocaleString('id-ID')}</p>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full" onClick={() => setShowSellerDetail(false)}>
-                Tutup
-              </Button>
-            </div>
-          )}
-        </Modal>
-
-        {/* Order Detail Modal */}
-        <Modal isOpen={showOrderDetail} onClose={() => setShowOrderDetail(false)} title="Detail Pesanan">
-          {selectedOrder && (
-            <div className="space-y-4">
-              <div className="border-b pb-3">
-                <h3 className="font-semibold">{selectedOrder.id}</h3>
-                <p className="text-sm text-muted-foreground">Tanggal: {selectedOrder.date}</p>
-                {getStatusBadge(selectedOrder.status)}
-              </div>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground">Customer</p>
-                  <p className="font-medium">{selectedOrder.customer}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Penjual</p>
-                  <p className="font-medium">{selectedOrder.seller}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Items</p>
-                  <p className="font-medium">{selectedOrder.items}</p>
-                </div>
-              </div>
-              <div className="border-t pt-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Total</span>
-                  <span className="font-bold text-primary">Rp {selectedOrder.total.toLocaleString('id-ID')}</span>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full" onClick={() => setShowOrderDetail(false)}>
-                Tutup
-              </Button>
-            </div>
-          )}
-        </Modal>
 
         {/* Edit School Modal */}
         <Modal
@@ -746,6 +547,245 @@ const AdminDashboard = () => {
                 Hapus
               </Button>
             </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  }
+
+  // Sellers Tab
+  if (activeTab === 'sellers') {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="bg-card border-b">
+          <div className="px-4 py-4">
+            <h1 className="text-xl font-bold">Data Penjual</h1>
+          </div>
+        </header>
+
+        {/* Sellers List */}
+        <div className="p-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {sellers.map((seller) => (
+            <Card key={seller.id} className="p-4">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h3 className="font-semibold">{seller.name}</h3>
+                  <p className="text-sm text-muted-foreground">{seller.canteen}</p>
+                  <p className="text-sm text-muted-foreground">{seller.school}</p>
+                  <div className="mt-2">
+                    {getStatusBadge(seller.status)}
+                  </div>
+                </div>
+                <Button variant="outline" size="icon" onClick={() => handleViewSeller(seller)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t">
+          <div className="flex items-center justify-around py-2 text-xs">
+            {[
+              { id: 'users', icon: Users, label: 'User' },
+              { id: 'schools', icon: School, label: 'Sekolah' },
+              { id: 'sellers', icon: Store, label: 'Penjual' },
+              { id: 'orders', icon: Package, label: 'Pesanan' },
+              { id: 'settings', icon: Settings, label: 'Setting' }
+            ].map(tab => (
+              <Button
+                key={tab.id}
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center space-y-1 ${
+                  activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                <tab.icon className="w-5 h-5" />
+                <span className="text-xs">{tab.label}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Seller Detail Modal */}
+        <Modal isOpen={showSellerDetail} onClose={() => setShowSellerDetail(false)} title="Detail Penjual">
+          {selectedSeller && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Store className="w-8 h-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{selectedSeller.name}</h3>
+                  {getStatusBadge(selectedSeller.status)}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Nama Kantin</p>
+                  <p className="font-medium">{selectedSeller.canteen}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sekolah</p>
+                  <p className="font-medium">{selectedSeller.school}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">No. Telepon</p>
+                  <p className="font-medium">{selectedSeller.phone}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Penjualan</p>
+                  <p className="font-medium text-primary">Rp {selectedSeller.totalSales?.toLocaleString('id-ID')}</p>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowSellerDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+      </div>
+    );
+  }
+
+  // Orders Tab
+  if (activeTab === 'orders') {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <header className="bg-card border-b">
+          <div className="px-4 py-4">
+            <h1 className="text-xl font-bold">Data Pesanan</h1>
+          </div>
+        </header>
+
+        {/* Orders List */}
+        <div className="p-4 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+          {orders.map((order) => (
+            <Card key={order.id} className="p-4">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h3 className="font-semibold">{order.id}</h3>
+                  <p className="text-sm text-muted-foreground">{order.customer} → {order.seller}</p>
+                  <p className="text-sm text-muted-foreground">{order.date}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="font-semibold text-primary">
+                      Rp {order.total.toLocaleString('id-ID')}
+                    </span>
+                    {getStatusBadge(order.status)}
+                  </div>
+                </div>
+                <Button variant="outline" size="icon" onClick={() => handleViewOrder(order)}>
+                  <Eye className="w-4 h-4" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-card border-t">
+          <div className="flex items-center justify-around py-2 text-xs">
+            {[
+              { id: 'users', icon: Users, label: 'User' },
+              { id: 'schools', icon: School, label: 'Sekolah' },
+              { id: 'sellers', icon: Store, label: 'Penjual' },
+              { id: 'orders', icon: Package, label: 'Pesanan' },
+              { id: 'settings', icon: Settings, label: 'Setting' }
+            ].map(tab => (
+              <Button
+                key={tab.id}
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center space-y-1 ${
+                  activeTab === tab.id ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                <tab.icon className="w-5 h-5" />
+                <span className="text-xs">{tab.label}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Order Detail Modal */}
+        <Modal isOpen={showOrderDetail} onClose={() => setShowOrderDetail(false)} title="Detail Pesanan">
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="border-b pb-3">
+                <h3 className="font-semibold">{selectedOrder.id}</h3>
+                <p className="text-sm text-muted-foreground">Tanggal: {selectedOrder.date}</p>
+                {getStatusBadge(selectedOrder.status)}
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Customer</p>
+                  <p className="font-medium">{selectedOrder.customer}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Penjual</p>
+                  <p className="font-medium">{selectedOrder.seller}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Items</p>
+                  <p className="font-medium">{selectedOrder.items}</p>
+                </div>
+              </div>
+              <div className="border-t pt-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Total</span>
+                  <span className="font-bold text-primary">Rp {selectedOrder.total.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowOrderDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+
+        {/* Notifications Modal */}
+        <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Notifikasi Admin">
+          <div className="space-y-4">
+            {notifications.map((notif) => (
+              <div key={notif.id} className={`p-3 rounded-lg border ${!notif.read ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'}`}>
+                <div className="flex justify-between items-start mb-1">
+                  <h4 className="font-medium text-sm">{notif.title}</h4>
+                  <span className="text-xs text-muted-foreground">{notif.time}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">{notif.message}</p>
+                {!notif.read && (
+                  <div className="flex justify-end mt-2">
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => {
+                        setNotifications(notifications.map(n => 
+                          n.id === notif.id ? {...n, read: true} : n
+                        ));
+                      }}
+                    >
+                      Tandai Dibaca
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => {
+                setNotifications(notifications.map(n => ({...n, read: true})));
+                showToast({ type: 'success', title: 'Semua notifikasi ditandai sebagai dibaca', description: '' });
+              }}
+            >
+              Tandai Semua Dibaca
+            </Button>
           </div>
         </Modal>
       </div>
