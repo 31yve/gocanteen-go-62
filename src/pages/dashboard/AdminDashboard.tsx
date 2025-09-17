@@ -550,6 +550,204 @@ const AdminDashboard = () => {
             </Button>
           </div>
         </Modal>
+
+        {/* User Detail Modal */}
+        <Modal isOpen={showUserDetail} onClose={() => setShowUserDetail(false)} title="Detail User">
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <User className="w-8 h-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{selectedUser.name}</h3>
+                  {getRoleBadge(selectedUser.role)}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium">{selectedUser.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sekolah</p>
+                  <p className="font-medium">{selectedUser.school}</p>
+                </div>
+                {selectedUser.class && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Kelas</p>
+                    <p className="font-medium">{selectedUser.class}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm text-muted-foreground">No. Telepon</p>
+                  <p className="font-medium">{selectedUser.phone}</p>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowUserDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+
+        {/* Seller Detail Modal */}
+        <Modal isOpen={showSellerDetail} onClose={() => setShowSellerDetail(false)} title="Detail Penjual">
+          {selectedSeller && (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Store className="w-8 h-8 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{selectedSeller.name}</h3>
+                  {getStatusBadge(selectedSeller.status)}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Nama Kantin</p>
+                  <p className="font-medium">{selectedSeller.canteen}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sekolah</p>
+                  <p className="font-medium">{selectedSeller.school}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">No. Telepon</p>
+                  <p className="font-medium">{selectedSeller.phone}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Penjualan</p>
+                  <p className="font-medium text-primary">Rp {selectedSeller.totalSales?.toLocaleString('id-ID')}</p>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowSellerDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+
+        {/* Order Detail Modal */}
+        <Modal isOpen={showOrderDetail} onClose={() => setShowOrderDetail(false)} title="Detail Pesanan">
+          {selectedOrder && (
+            <div className="space-y-4">
+              <div className="border-b pb-3">
+                <h3 className="font-semibold">{selectedOrder.id}</h3>
+                <p className="text-sm text-muted-foreground">Tanggal: {selectedOrder.date}</p>
+                {getStatusBadge(selectedOrder.status)}
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-muted-foreground">Customer</p>
+                  <p className="font-medium">{selectedOrder.customer}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Penjual</p>
+                  <p className="font-medium">{selectedOrder.seller}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Items</p>
+                  <p className="font-medium">{selectedOrder.items}</p>
+                </div>
+              </div>
+              <div className="border-t pt-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Total</span>
+                  <span className="font-bold text-primary">Rp {selectedOrder.total.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => setShowOrderDetail(false)}>
+                Tutup
+              </Button>
+            </div>
+          )}
+        </Modal>
+
+        {/* Edit School Modal */}
+        <Modal
+          isOpen={showEditSchool}
+          onClose={() => setShowEditSchool(false)}
+          title="Edit Sekolah"
+        >
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="editSchoolName">Nama Sekolah</Label>
+              <Input
+                id="editSchoolName"
+                placeholder="Masukkan nama sekolah"
+                value={newSchool.name}
+                onChange={(e) => setNewSchool({...newSchool, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editSchoolAddress">Alamat</Label>
+              <Input
+                id="editSchoolAddress"
+                placeholder="Masukkan alamat sekolah"
+                value={newSchool.address}
+                onChange={(e) => setNewSchool({...newSchool, address: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editSchoolContact">Kontak</Label>
+              <Input
+                id="editSchoolContact"
+                placeholder="Nomor telepon / email (opsional)"
+                value={newSchool.contact}
+                onChange={(e) => setNewSchool({...newSchool, contact: e.target.value})}
+              />
+            </div>
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowEditSchool(false);
+                  setSelectedSchool(null);
+                  setNewSchool({ name: '', address: '', contact: '' });
+                }}
+              >
+                Batal
+              </Button>
+              <Button className="flex-1 btn-ripple" onClick={handleUpdateSchool}>
+                Update Sekolah
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Delete School Confirmation Modal */}
+        <Modal
+          isOpen={showDeleteSchoolConfirm}
+          onClose={() => setShowDeleteSchoolConfirm(false)}
+          title="Hapus Sekolah"
+        >
+          <div className="space-y-4">
+            <p>Apakah Anda yakin ingin menghapus sekolah <strong>{selectedSchool?.name}</strong>?</p>
+            <p className="text-sm text-muted-foreground">Tindakan ini tidak dapat dibatalkan.</p>
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setShowDeleteSchoolConfirm(false);
+                  setSelectedSchool(null);
+                }}
+              >
+                Batal
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={confirmDeleteSchool}
+              >
+                Hapus
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </div>
     );
   }
